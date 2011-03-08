@@ -11,4 +11,4 @@ Chronos implements the WindowTimers interface defined by HTML 5.
       void clearInterval(in long handle);
     };
 
-[blog post]: /Users/fitzgen/Desktop/chronos-test.html
+[blog post]: #
