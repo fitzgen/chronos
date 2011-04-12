@@ -79,3 +79,21 @@ asyncTest("clearTimeout doesn't cancel intervals", function () {
         start();
     }, 100);
 });
+
+test("patchGlobals will monkey patch chronos' methods on to window", function () {
+    var oldSetTimeout = setTimeout,
+        oldSetInterval = setInterval,
+        oldClearTimeout = clearTimeout,
+        oldClearInterval = clearInterval;
+
+    chronos.patchGlobals();
+    ok(setTimeout === chronos.setTimeout);
+    ok(setInterval === chronos.setInterval);
+    ok(clearTimeout === chronos.clearTimeout);
+    ok(clearInterval === chronos.clearInterval);
+
+    setTimeout = oldSetTimeout;
+    setInterval = oldSetInterval;
+    clearTimeout = oldClearTimeout;
+    clearInterval = oldClearInterval;
+});

@@ -30,7 +30,7 @@ setInterval = setInterval;
 clearTimeout = clearTimeout;
 clearInterval = clearInterval;
 
-(function (chronos, realSetTimeout) {
+window["chronos"] = (function (global, realSetTimeout) {
 
     // ## Variables and Utilities
 
@@ -65,7 +65,7 @@ clearInterval = clearInterval;
         : function (obj) {
             var ks = [], k;
             for ( k in obj ) {
-                if ( hasOwnProperty.call(k) ) {
+                if ( hasOwnProperty.call(obj, k) ) {
                     ks.push(k);
                 }
             }
@@ -172,7 +172,6 @@ clearInterval = clearInterval;
     // it. Otherwise, do nothing.
     function maybeInit () {
         if ( ! initialized ) {
-            lastTimeRan = +new Date();
             realSetTimeout(taskRunner, INTERVAL);
             initialized = true;
         }
@@ -205,33 +204,45 @@ clearInterval = clearInterval;
     //
     // The arguments and return values of the functions exposed in the public
     // API exactly match that of their respective timer functions defined on
-    // `window` by the HTML 5 specification. The only exception is
-    // `minimumInterval`, which is specific to Chronos.
+    // `window` by the HTML 5 specification. The only exceptions being
+    // `minimumInterval` and `patchGlobals`.
 
-    chronos.setTimeout = function (fn, ms /*, args... */) {
-        var args = slice(arguments, 2);
-        return registerTask(false, fn, ms, args);
-    };
+    return {
 
-    chronos.setInterval = function (fn, ms /*, args... */) {
-        var args = slice(arguments, 2);
-        return registerTask(true, fn, ms, args);
-    };
+        "setTimeout": function (fn, ms /*, args... */) {
+            var args = slice(arguments, 2);
+            return registerTask(false, fn, ms, args);
+        },
 
-    chronos.clearTimeout = function (id) {
-        deregisterTask(false, id);
-    };
+        "setInterval": function (fn, ms /*, args... */) {
+            var args = slice(arguments, 2);
+            return registerTask(true, fn, ms, args);
+        },
 
-    chronos.clearInterval = function (id) {
-        deregisterTask(true, id);
-    };
+        "clearTimeout": function (id) {
+            deregisterTask(false, id);
+        },
 
-    // Get or set the minimum interval which the task runner checks for
-    // tasks to execute.
-    chronos.minimumInterval = function (newInterval) {
-        return arguments.length === 1 && typeof newInterval === "number"
-            ? INTERVAL = newInterval
-            : INTERVAL;
+        "clearInterval": function (id) {
+            deregisterTask(true, id);
+        },
+
+        // Get or set the minimum interval which the task runner checks for
+        // tasks to execute.
+        "minimumInterval": function (newInterval) {
+            return arguments.length === 1 && typeof newInterval === "number"
+                ? INTERVAL = newInterval
+                : INTERVAL;
+        },
+
+        // Patch the global definitions of `setTimeout`, and friends.
+        "patchGlobals": function () {
+            global.setTimeout = this.setTimeout;
+            global.setInterval = this.setInterval;
+            global.clearTimeout = this.clearTimeout;
+            global.clearInterval = this.clearInterval;
+        }
+
     };
 
 }(this, setTimeout));
