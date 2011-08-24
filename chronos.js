@@ -102,7 +102,7 @@ window["chronos"] = (function () {
     // returns how many milliseconds are left till the next time it should be
     // run.
     function decrementTimeTillNext (task) {
-        return task.next -= (+new Date()) - task.lastTimeRan;
+        return task.next = task.timeout - ((+new Date()) - task.lastTimeRan);
     }
 
     // Return true if the task repeats multiple times, false if it is a task to
