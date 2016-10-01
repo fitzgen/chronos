@@ -145,10 +145,12 @@ window["chronos"] = (function () {
                 if ( tasks[tasksToRun[i]]
                      && decrementTimeTillNext(tasks[tasksToRun[i]]) < INTERVAL / 2 ) {
                     runTask(tasks[tasksToRun[i]]);
-                    if ( taskRepeats(tasks[tasksToRun[i]]) ) {
-                        resetTimeTillNext(tasks[tasksToRun[i]]);
-                    } else {
-                        delete tasks[tasksToRun[i]];
+                    if ( tasks[tasksToRun[i]] ) {
+                      if ( taskRepeats(tasks[tasksToRun[i]]) ) {
+                          resetTimeTillNext(tasks[tasksToRun[i]]);
+                      } else {
+                          delete tasks[tasksToRun[i]];
+                      }
                     }
                 }
             }
